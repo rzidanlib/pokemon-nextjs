@@ -1,6 +1,6 @@
 import clientPromise from "./init";
 import { ObjectId } from "mongodb";
-// import bcrypt from "bcrypt";
+import bcrypt from "bcrypt";
 
 const database = process.env.DB_NAME;
 
@@ -14,6 +14,33 @@ export async function login(data: { email: string }) {
     return user;
   } else {
     return null;
+  }
+}
+
+// REGISTER
+export async function register(data: {
+  fullname: string;
+  email: string;
+  password: string;
+  gender: string;
+  role?: string;
+}) {
+  const client = await clientPromise;
+  const usersCollection = client.db(database).collection("users");
+  const existUser = await usersCollection.findOne({ email: data.email });
+
+  if (existUser) {
+    return { status: false, statusCode: 400, message: "Email sudah ada." };
+  } else {
+    data.role = "member";
+    data.password = await bcrypt.hash(data.password, 10);
+
+    try {
+      await usersCollection.insertOne(data);
+      return { status: true, statusCode: 200, message: "Register success." };
+    } catch (error) {
+      return { status: true, statusCode: 400, message: "Register failed." };
+    }
   }
 }
 
@@ -67,5 +94,45 @@ export async function saveLocation(data: {
     return { status: true, statusCode: 200, message: "Add Location success." };
   } catch (error) {
     return { status: true, statusCode: 400, message: "Add Location failed." };
+  }
+}
+
+// Find Nearby User
+
+export async function findNearbyUser(data: {
+  userId: string;
+  latitude: number;
+  longitude: number;
+  maxDistance: number;
+}) {
+  const client = await clientPromise;
+  const usersCollection = client.db(database).collection("users");
+
+  console.log("latitude", data.latitude);
+  console.log("longitude", data.longitude);
+
+  const nearbyUsers = await usersCollection
+    .find({
+      _id: { $ne: new ObjectId(data.userId) },
+      "locations.latitude": {
+        $gte: data.latitude - data.maxDistance,
+        $lte: data.latitude + data.maxDistance,
+      },
+      "locations.longitude": {
+        $gte: data.longitude - data.maxDistance,
+        $lte: data.longitude + data.maxDistance,
+      },
+    })
+    .toArray();
+
+  if (nearbyUsers) {
+    return {
+      status: true,
+      statusCode: 200,
+      message: "Nearby user success.",
+      data: nearbyUsers,
+    };
+  } else {
+    return { status: true, statusCode: 400, message: "Nearby user failed" };
   }
 }

@@ -3,12 +3,13 @@
 import AuthHeader from "@/components/component/AuthHeader";
 import InputText from "@/components/elements/Input";
 import Label from "@/components/elements/Label";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Login() {
+  const { status }: { status: string } = useSession();
   const { push } = useRouter();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -37,6 +38,10 @@ export default function Login() {
       console.log(error);
     }
   };
+
+  if (status === "authenticated") {
+    push("/dashboard");
+  }
 
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">

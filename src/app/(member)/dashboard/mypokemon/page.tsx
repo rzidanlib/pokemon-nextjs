@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 export default function MyPokemonsPage() {
   const { data: session }: { data: any } = useSession();
 
-  const { user, error, loading } = useFetchUser(session?.user._id as string);
+  const { user, error, loading } = useFetchUser();
 
   return (
     <div>

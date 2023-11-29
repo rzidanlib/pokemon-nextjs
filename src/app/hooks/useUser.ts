@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 
-export const useFetchUser = (userId: string) => {
+export const useFetchUser = () => {
+  const { data: session }: { data: any } = useSession();
+  const userId = session?.user._id;
+
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);

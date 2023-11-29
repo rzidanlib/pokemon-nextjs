@@ -11,7 +11,7 @@ export default function DashboardPage() {
   const { data: session, status }: { data: any; status: string } = useSession();
   const userId = session?.user._id;
 
-  const { user, loading, error } = useFetchUser(userId as string);
+  const { user, loading, error } = useFetchUser();
 
   return (
     <div className="grid grid-cols-3 gap-3">

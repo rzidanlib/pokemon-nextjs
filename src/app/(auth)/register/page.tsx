@@ -5,11 +5,13 @@ import InputText from "@/components/elements/Input";
 import Label from "@/components/elements/Label";
 import RadioButton from "@/components/elements/RadioButton";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Login() {
+  const { status }: { status: string } = useSession();
   const { push } = useRouter();
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -45,6 +47,10 @@ export default function Login() {
       setIsLoading(false);
     }
   };
+
+  if (status === "authenticated") {
+    redirect("/dashboard");
+  }
 
   return (
     <div className="grid grid-cols-2 h-screen">

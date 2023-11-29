@@ -16,7 +16,7 @@ export default function LocationPage() {
     country: string;
   } | null>(null);
 
-  const { user, error, loading } = useFetchUser(session?.user._id as string);
+  const { user, error, loading } = useFetchUser();
 
   const handleGetLocation = async () => {
     try {
