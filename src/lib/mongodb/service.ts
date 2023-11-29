@@ -98,7 +98,6 @@ export async function saveLocation(data: {
 }
 
 // Find Nearby User
-
 export async function findNearbyUser(data: {
   userId: string;
   latitude: number;
@@ -107,9 +106,6 @@ export async function findNearbyUser(data: {
 }) {
   const client = await clientPromise;
   const usersCollection = client.db(database).collection("users");
-
-  console.log("latitude", data.latitude);
-  console.log("longitude", data.longitude);
 
   const nearbyUsers = await usersCollection
     .find({
@@ -134,5 +130,25 @@ export async function findNearbyUser(data: {
     };
   } else {
     return { status: true, statusCode: 400, message: "Nearby user failed" };
+  }
+}
+
+// Friend Request Queue
+export async function friendRequest(data: {
+  userId: string;
+  requestId: string;
+}) {
+  const client = await clientPromise;
+  const requestFriend = client.db(database).collection("friendRequest");
+
+  try {
+    await requestFriend.insertOne({
+      userId: data.userId,
+      requestFriends: [{ requestId: data.requestId, status: "pending" }],
+    });
+
+    return { status: true, statusCode: 200, message: "Add Request Success" };
+  } catch (error) {
+    return { status: true, statusCode: 400, message: "Add Request failed" };
   }
 }
